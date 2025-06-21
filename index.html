@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Generator App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Menu Generator App</h1>
+            <p>Upload a menu image and generate beautiful item visuals</p>
+        </div>
+
+        <div class="upload-section">
+            <div class="demo-note">
+                <strong>Live Mode:</strong> This app will now use real API calls to extract menu text and generate images!
+            </div>
+
+            <div class="api-config">
+                <h3>API Configuration</h3>
+                <input type="text" id="geminiKey" class="api-input" placeholder="Gemini API Key (for text extraction )">
+                <input type="text" id="fluxKey" class="api-input" placeholder="Flux API Key (ImageGen)">
+
+                <small style="color: #666;">Get your free Gemini API key from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></small>
+            </div>
+
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📱</div>
+                <div class="upload-text">Click to upload menu image</div>
+                <div class="upload-subtext">or drag and drop here</div>
+            </div>
+            <input type="file" id="fileInput" accept="image/*">
+            
+            <div id="uploadedImageContainer" style="display: none;">
+                <img id="uploadedImage" class="uploaded-image" alt="Uploaded menu">
+                <br>
+                <button class="btn" onclick="processMenu()">Generate Menu Items</button>
+            </div>
+        </div>
+
+        <div id="processing" class="processing" style="display: none;">
+            <div class="spinner"></div>
+            <h3>Processing your menu...</h3>
+            <p>Extracting text and generating images</p>
+        </div>
+
+        <div id="menuResults" class="menu-results" style="display: none;">
+            <h2>Generated Menu Items</h2>
+            <div id="menuGrid" class="menu-grid"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
