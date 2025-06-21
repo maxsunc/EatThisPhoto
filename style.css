@@ -35,6 +35,10 @@ body {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+#uploadedImage{
+    border: 4px #333 ;
+}
+
 .header p {
     font-size: 1.1em;
     opacity: 0.9;

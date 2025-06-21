@@ -255,7 +255,8 @@ async function generateImagesWithGemini(menuItems, geminiApiKey) {
 
         // Throttle requests
         if (i < menuItems.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            //CHANGED
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
 
@@ -456,7 +457,7 @@ function appendMenuItem(item) {
             <div class="menu-item-name">${escapeHtml(item.name)}</div>
             <div class="menu-item-description">${escapeHtml(item.description)}</div>
             <div class="menu-item-price">${escapeHtml(item.price)}</div>
-            ${item.imageData ? `<button class="download-btn" onclick="downloadItemImage('${escapeHtml(item.name)}', '${item.imageData}', '${item.mimeType || 'image/png'}')">📥 Download Image</button>` : ''}
+            ${item.nutrition ? `<div class="menu-item-nutrition">${escapeHtml(item.nutrition)}</div>` : ''}
         </div>
     `;
 
