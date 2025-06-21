@@ -1,14 +1,17 @@
 let uploadedFile = null;
 
 // File upload handling
-const fileInput = document.getElementById('fileInput');
+// const fileInput = document.getElementById('fileInput');
+// const uploadArea = document.querySelector('.upload-area');
+const cameraInput = document.getElementById('cameraInput');
 const uploadArea = document.querySelector('.upload-area');
 const uploadedImageContainer = document.getElementById('uploadedImageContainer');
 const uploadedImage = document.getElementById('uploadedImage');
 
 // Initialize event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    fileInput.addEventListener('change', handleFileSelect);
+    // fileInput.addEventListener('change', handleFileSelect);
+    cameraInput.addEventListener('change', handleFileSelect);
 
     // Drag and drop
     uploadArea.addEventListener('dragover', (e) => {
