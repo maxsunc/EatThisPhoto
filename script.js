@@ -9,7 +9,7 @@ const uploadedImageContainer = document.getElementById('uploadedImageContainer')
 const uploadedImage = document.getElementById('uploadedImage');
 
 // Initialize event listeners when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // fileInput.addEventListener('change', handleFileSelect);
     cameraInput.addEventListener('change', handleFileSelect);
 
@@ -72,17 +72,17 @@ async function processMenu() {
     const processing = document.getElementById('processing');
     const menuResults = document.getElementById('menuResults');
     const geminiKey = document.getElementById('geminiKey').value.trim();
-    
+
     if (!geminiKey) {
         showError('Please provide a Gemini API key for processing.');
         return;
     }
-    
+
     if (!uploadedFile) {
         showError('Please upload a menu image first.');
         return;
     }
-    
+
     processing.style.display = 'block';
     menuResults.style.display = 'none';
 
@@ -90,18 +90,18 @@ async function processMenu() {
         // Step 1: Extract menu text using Gemini Vision
         updateProcessingText('Extracting menu text with Gemini...');
         const menuItems = await extractMenuTextWithGemini(uploadedFile, geminiKey);
-        
+
         if (!menuItems || menuItems.length === 0) {
             throw new Error('No menu items could be extracted from the image');
         }
-        
+
         // Step 2: Generate images for each menu item using Gemini
         updateProcessingText('Generating food images with Gemini...');
         const itemsWithImages = await generateImagesWithGemini(menuItems, geminiKey);
-        
+
         processing.style.display = 'none';
         displayMenuItems(itemsWithImages);
-        
+
     } catch (error) {
         processing.style.display = 'none';
         showError(`Error processing menu: ${error.message}`);
@@ -122,7 +122,7 @@ async function extractMenuTextWithGemini(imageFile, apiKey) {
     try {
         const base64Image = await fileToBase64(imageFile);
         const mimeType = imageFile.type;
-        
+
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: {
@@ -133,20 +133,23 @@ async function extractMenuTextWithGemini(imageFile, apiKey) {
                     parts: [
                         {
                             text: `Please analyze this menu image and extract all menu items. For each item, provide:
-                            1. name (string)
-                            2. description (string, if available)
-                            3. price (string, if available)
-                            
-                            Return the data as a JSON array like this:
-                            [
-                                {
-                                    "name": "Item Name",
-                                    "description": "Item description",
-                                    "price": "$0.00"
-                                }
-                            ]
-                            
-                            If no description is available, create a brief appetizing description based on the item name. If no price is available, use "Market Price". Please ensure the response is valid JSON format and that all fields are strings (not null or undefined).`
+1. name (string)
+2. description (string, if available)
+3. price (string, if available)
+4. estimated nutrition facts as a string (e.g., "Calories: 450, Protein: 12g, Fat: 20g, Carbs: 55g")
+
+Return the data as a JSON array like this:
+[
+    {
+        "name": "Item Name",
+        "description": "Item description",
+        "price": "$0.00",
+        "nutrition": "Calories: 450, Protein: 12g, Fat: 20g, Carbs: 55g"
+    }
+]
+
+If no description is available, create one based on the name. If no price is available, use "Market Price". If nutrition cannot be determined from the name, make a reasonable guess. Ensure all fields are strings and the response is valid JSON.`
+
                         },
                         {
                             inline_data: {
@@ -173,20 +176,22 @@ async function extractMenuTextWithGemini(imageFile, apiKey) {
 
         const data = await response.json();
         const content = data.candidates[0].content.parts[0].text;
-        
+
         try {
             // Extract JSON from the response
             const jsonMatch = content.match(/\[[\s\S]*\]/);
             if (jsonMatch) {
                 const menuItems = JSON.parse(jsonMatch[0]);
-                
+
                 // Validate and sanitize the menu items
                 const validatedItems = Array.isArray(menuItems) ? menuItems.map(item => ({
                     name: item.name || 'Unknown Item',
                     description: item.description || 'Delicious menu item',
-                    price: item.price || 'Market Price'
+                    price: item.price || 'Market Price',
+                    nutrition: item.nutrition || 'Nutrition info unavailable'
                 })) : [];
-                
+
+
                 return validatedItems;
             } else {
                 throw new Error('No valid JSON array found in response');
@@ -210,20 +215,20 @@ async function extractMenuTextWithGemini(imageFile, apiKey) {
 // Generate images using Gemini
 async function generateImagesWithGemini(menuItems, geminiApiKey) {
     const itemsWithImages = [];
-    
+
     for (let i = 0; i < menuItems.length; i++) {
         const item = menuItems[i];
         updateProcessingText(`Generating image ${i + 1}/${menuItems.length}: ${item.name}`);
-        
+
         try {
             const imageData = await generateGeminiImage(item, geminiApiKey);
-            
+
             itemsWithImages.push({
                 ...item,
                 imageUrl: imageData.url,
                 imageData: imageData.base64
             });
-            
+
             console.log(`Successfully generated image for: ${item.name}`);
         } catch (error) {
             console.warn(`Failed to generate image for ${item.name}:`, error);
@@ -233,13 +238,13 @@ async function generateImagesWithGemini(menuItems, geminiApiKey) {
                 imageError: error.message
             });
         }
-        
+
         // Add delay between requests to avoid rate limiting
         if (i < menuItems.length - 1) {
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
     }
-    
+
     return itemsWithImages;
 }
 
@@ -248,9 +253,9 @@ async function generateGeminiImage(item, apiKey) {
     try {
         // Create a detailed prompt for professional food photography
         const prompt = createFoodPrompt(item);
-        
+
         console.log(`Generating image for ${item.name} with prompt: ${prompt}`);
-        
+
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: {
@@ -269,7 +274,7 @@ async function generateGeminiImage(item, apiKey) {
         });
 
         console.log(`Response status: ${response.status}`);
-        
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             const errorMessage = errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`;
@@ -278,7 +283,7 @@ async function generateGeminiImage(item, apiKey) {
 
         const data = await response.json();
         console.log('Generate response data:', data);
-        
+
         // Process the response to find image data
         const candidate = data.candidates?.[0];
         if (!candidate) {
@@ -289,7 +294,7 @@ async function generateGeminiImage(item, apiKey) {
             if (part.inline_data || part.inlineData) {
                 const imageData = part.inline_data?.data || part.inlineData?.data;
                 const mimeType = part.inline_data?.mime_type || part.inlineData?.mime_type || 'image/png';
-                
+
                 if (imageData) {
                     // Create data URL for display
                     const dataUrl = `data:${mimeType};base64,${imageData}`;
@@ -301,12 +306,12 @@ async function generateGeminiImage(item, apiKey) {
                 }
             }
         }
-        
+
         throw new Error('No image was generated in the response');
-        
+
     } catch (error) {
         console.error(`Error generating image for ${item.name}:`, error);
-        
+
         // Provide more specific error messages
         if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
             throw new Error('Network error: Unable to connect to Gemini API.');
@@ -317,7 +322,7 @@ async function generateGeminiImage(item, apiKey) {
         } else if (error.message.includes('429')) {
             throw new Error('Gemini API rate limit exceeded. Please wait and try again.');
         }
-        
+
         throw error;
     }
 }
@@ -325,11 +330,11 @@ async function generateGeminiImage(item, apiKey) {
 // Create optimized prompt for food photography
 function createFoodPrompt(item) {
     const basePrompt = `Professional food photography of ${item.name}`;
-    
+
     // Add style descriptors based on food type
     const styleDescriptors = [
         "beautifully plated",
-        "restaurant quality presentation", 
+        "restaurant quality presentation",
         "appetizing",
         "high-end culinary photography",
         "studio lighting",
@@ -337,23 +342,23 @@ function createFoodPrompt(item) {
         "garnished",
         "fresh ingredients"
     ];
-    
+
     // Add specific details based on item description if available
     let enhancedPrompt = basePrompt;
     if (item.description && item.description !== 'Delicious menu item') {
         enhancedPrompt += `, ${item.description}`;
     }
-    
+
     // Add random style elements for variety
     const selectedStyles = styleDescriptors
         .sort(() => 0.5 - Math.random())
         .slice(0, 3);
-    
+
     enhancedPrompt += `, ${selectedStyles.join(', ')}`;
-    
+
     // Add technical photography terms
     enhancedPrompt += ", 85mm lens, natural lighting, food styling, commercial photography";
-    
+
     return enhancedPrompt;
 }
 
@@ -369,13 +374,13 @@ function fileToBase64(file) {
 function displayMenuItems(items) {
     const menuResults = document.getElementById('menuResults');
     const menuGrid = document.getElementById('menuGrid');
-    
+
     menuGrid.innerHTML = '';
-    
+
     items.forEach((item, index) => {
         const menuItem = document.createElement('div');
         menuItem.className = 'menu-item';
-        
+
         // Create image element
         let imageElement;
         if (item.imageUrl) {
@@ -385,19 +390,19 @@ function displayMenuItems(items) {
             const errorMsg = item.imageError ? ` (${item.imageError})` : '';
             imageElement = `<div class="menu-item-image fallback-image">🍽️ ${escapeHtml(item.name)}${errorMsg}</div>`;
         }
-        
+
         menuItem.innerHTML = `
             ${imageElement}
             <div class="menu-item-content">
                 <div class="menu-item-name">${escapeHtml(item.name)}</div>
                 <div class="menu-item-description">${escapeHtml(item.description)}</div>
                 <div class="menu-item-price">${escapeHtml(item.price)}</div>
-                ${item.imageData ? `<button class="download-btn" onclick="downloadItemImage('${escapeHtml(item.name)}', '${item.imageData}', '${item.mimeType || 'image/png'}')">📥 Download Image</button>` : ''}
+                ${item.nutrition ? `<div class="menu-item-nutrition">${escapeHtml(item.nutrition)}</div>` : ''}
             </div>
         `;
-        
+
         menuGrid.appendChild(menuItem);
-        
+
         // Animate items in
         setTimeout(() => {
             menuItem.style.opacity = '0';
@@ -409,7 +414,7 @@ function displayMenuItems(items) {
             });
         }, index * 100);
     });
-    
+
     menuResults.style.display = 'block';
 }
 
@@ -423,7 +428,7 @@ function downloadItemImage(itemName, base64Data, mimeType) {
         }
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: mimeType });
-        
+
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -444,11 +449,11 @@ function escapeHtml(unsafe) {
     if (unsafe == null || typeof unsafe !== 'string') {
         return '';
     }
-    
+
     return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }

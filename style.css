@@ -264,3 +264,12 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+.menu-item-nutrition {
+    font-size: 0.9em;
+    color: #444;
+    margin-top: 10px;
+    background: #f9f9f9;
+    padding: 8px;
+    border-radius: 6px;
+}
