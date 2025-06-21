@@ -67,6 +67,7 @@ function showError(message) {
     setTimeout(() => errorDiv.remove(), 5000);
 }
 
+
 // Menu processing with Gemini APIs
 async function processMenu() {
     const processing = document.getElementById('processing');
@@ -100,6 +101,8 @@ async function processMenu() {
         const itemsWithImages = await generateImagesWithGemini(menuItems, geminiKey);
         
         processing.style.display = 'none';
+
+    
         displayMenuItems(itemsWithImages);
         
     } catch (error) {
@@ -209,38 +212,45 @@ async function extractMenuTextWithGemini(imageFile, apiKey) {
 
 // Generate images using Gemini
 async function generateImagesWithGemini(menuItems, geminiApiKey) {
-    const itemsWithImages = [];
-    
+    const menuResults = document.getElementById('menuResults');
+    const menuGrid = document.getElementById('menuGrid');
+    menuGrid.innerHTML = '';
+    menuResults.style.display = 'block';
+
     for (let i = 0; i < menuItems.length; i++) {
         const item = menuItems[i];
         updateProcessingText(`Generating image ${i + 1}/${menuItems.length}: ${item.name}`);
-        
+
         try {
             const imageData = await generateGeminiImage(item, geminiApiKey);
-            
-            itemsWithImages.push({
+
+            const itemWithImage = {
                 ...item,
                 imageUrl: imageData.url,
-                imageData: imageData.base64
-            });
-            
-            console.log(`Successfully generated image for: ${item.name}`);
+                imageData: imageData.base64,
+                mimeType: imageData.mimeType
+            };
+
+            appendMenuItem(itemWithImage); // <== Display immediately
+
+            console.log(`✅ Image generated for: ${item.name}`);
         } catch (error) {
-            console.warn(`Failed to generate image for ${item.name}:`, error);
-            itemsWithImages.push({
+            console.warn(`⚠️ Failed to generate image for ${item.name}:`, error);
+            appendMenuItem({
                 ...item,
                 imageUrl: null,
                 imageError: error.message
             });
         }
-        
-        // Add delay between requests to avoid rate limiting
+
+        // Throttle requests
         if (i < menuItems.length - 1) {
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
     }
-    
-    return itemsWithImages;
+
+    // Done
+    document.getElementById('processing').style.display = 'none';
 }
 
 // Generate image using Gemini API
@@ -324,7 +334,7 @@ async function generateGeminiImage(item, apiKey) {
 
 // Create optimized prompt for food photography
 function createFoodPrompt(item) {
-    const basePrompt = `Professional food photography of ${item.name}`;
+    const basePrompt = `Professional food yummmyyyyyyyyyy yummmyyyyyyyyy photography of ${item.name}`;
     
     // Add style descriptors based on food type
     const styleDescriptors = [
@@ -411,6 +421,43 @@ function displayMenuItems(items) {
     });
     
     menuResults.style.display = 'block';
+}
+
+function appendMenuItem(item) {
+    const menuGrid = document.getElementById('menuGrid');
+
+    const menuItem = document.createElement('div');
+    menuItem.className = 'menu-item';
+
+    let imageElement;
+    if (item.imageUrl) {
+        imageElement = `<img src="${item.imageUrl}" class="menu-item-image" alt="${escapeHtml(item.name)}" style="width: 100%; height: 200px; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="menu-item-image fallback-image" style="display: none;">🍽️ ${escapeHtml(item.name)}</div>`;
+    } else {
+        const errorMsg = item.imageError ? ` (${item.imageError})` : '';
+        imageElement = `<div class="menu-item-image fallback-image">🍽️ ${escapeHtml(item.name)}${errorMsg}</div>`;
+    }
+
+    menuItem.innerHTML = `
+        ${imageElement}
+        <div class="menu-item-content">
+            <div class="menu-item-name">${escapeHtml(item.name)}</div>
+            <div class="menu-item-description">${escapeHtml(item.description)}</div>
+            <div class="menu-item-price">${escapeHtml(item.price)}</div>
+            ${item.imageData ? `<button class="download-btn" onclick="downloadItemImage('${escapeHtml(item.name)}', '${item.imageData}', '${item.mimeType || 'image/png'}')">📥 Download Image</button>` : ''}
+        </div>
+    `;
+
+    menuGrid.appendChild(menuItem);
+
+    // Animate
+    menuItem.style.opacity = '0';
+    menuItem.style.transform = 'translateY(20px)';
+    menuItem.style.transition = 'all 0.5s ease';
+    requestAnimationFrame(() => {
+        menuItem.style.opacity = '1';
+        menuItem.style.transform = 'translateY(0)';
+    });
 }
 
 // Function to download individual item images
