@@ -222,10 +222,11 @@ async function generateImagesWithGemini(menuItems, geminiApiKey) {
     menuGrid.innerHTML = '';
     menuResults.style.display = 'block';
 
+    const processedItems = []; // Add this array to collect processed items
+
     for (let i = 0; i < menuItems.length; i++) {
         const item = menuItems[i];
         updateProcessingText(`Generating image ${i + 1}/${menuItems.length}: ${item.name}`);
-
 
         try {
             const imageData = await generateGeminiImage(item, geminiApiKey);
@@ -237,16 +238,19 @@ async function generateImagesWithGemini(menuItems, geminiApiKey) {
                 mimeType: imageData.mimeType
             };
 
-            appendMenuItem(itemWithImage); // <== Display immediately
+            appendMenuItem(itemWithImage); // Display immediately
+            processedItems.push(itemWithImage); // Add to our return array
 
             console.log(`✅ Image generated for: ${item.name}`);
         } catch (error) {
             console.warn(`⚠️ Failed to generate image for ${item.name}:`, error);
-            appendMenuItem({
+            const itemWithError = {
                 ...item,
                 imageUrl: null,
                 imageError: error.message
-            });
+            };
+            appendMenuItem(itemWithError);
+            processedItems.push(itemWithError); // Add to our return array
         }
 
         // Throttle requests
@@ -257,6 +261,8 @@ async function generateImagesWithGemini(menuItems, geminiApiKey) {
 
     // Done
     document.getElementById('processing').style.display = 'none';
+    
+    return processedItems; // Return the processed items
 }
 
 // Generate image using Gemini API
