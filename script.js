@@ -8,6 +8,9 @@ const uploadArea = document.querySelector('.upload-area');
 const uploadedImageContainer = document.getElementById('uploadedImageContainer');
 const uploadedImage = document.getElementById('uploadedImage');
 
+
+
+
 // Initialize event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
     // fileInput.addEventListener('change', handleFileSelect);
@@ -512,3 +515,36 @@ function escapeHtml(unsafe) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+// ===== INTRO SCREEN FUNCTIONALITY =====
+// Add this code to your existing script.js file
+
+// Function to start the app (hide intro screen)
+function startApp() {
+    const introScreen = document.getElementById('introScreen');
+    const container = document.querySelector('.container');
+    
+    // Add fade-out class to intro screen
+    introScreen.classList.add('fade-out');
+    
+    // Hide intro screen after animation completes
+    setTimeout(() => {
+        introScreen.style.display = 'none';
+        // Make sure main container is visible
+        if (container) {
+            container.style.display = 'block';
+        }
+    }, 800); // Match the CSS transition duration
+}
+
+// Optional: Auto-hide intro screen after a certain time (uncomment if desired)
+// setTimeout(() => {
+//     startApp();
+// }, 5000); // Auto-hide after 5 seconds
+
+// Optional: Hide intro on any key press (uncomment if desired)
+// document.addEventListener('keydown', (e) => {
+//     if (document.getElementById('introScreen').style.display !== 'none') {
+//         startApp();
+//     }
+// });

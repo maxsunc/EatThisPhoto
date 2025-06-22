@@ -5,48 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eat This Photo</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+        <!-- Intro Screen - Insert this right after <body> tag and before the container div -->
+<div id="introScreen" class="intro-screen">
+    <div class="intro-background">
+        <div class="floating-elements">
+            <div class="element element-1">🍟</div>
+            <div class="element element-2">🍕</div>
+            <div class="element element-3">🌮</div>
+            <div class="element element-4">🍰</div>
+            <div class="element element-5">🥗</div>
+            <div class="element element-6">🍜</div>
+        </div>
+    </div>
+    
+    <div class="intro-content">
+        <div class="hamburger-container">
+            <div class="hamburger">
+                <div class="bun-top">
+                    <div class="sesame sesame-1"></div>
+                    <div class="sesame sesame-2"></div>
+                    <div class="sesame sesame-3"></div>
+                    <div class="sesame sesame-4"></div>
+                    <div class="sesame sesame-5"></div>
+                </div>
+                
+                <div class="tomato"></div>
+                <div class="patty"></div>
+                <div class="lettuce"></div>
+<div class="bottom-layer">
+    <div class="cheese"></div>
+    <div class="bun-bottom"></div>
+</div>
+
+            </div>
+            
+        </div>
+        
+        <h1 class="intro-title">
+            <span class="word">Eat</span>
+            <span class="word">This</span>
+            <span class="word">Photo</span>
+        </h1>
+        
+        <p class="intro-subtitle">Transform menu images into stunning visuals with AI magic</p>
+        
+        <button class="start-button" onclick="startApp()">
+            <span>Start Creating</span>
+            <div class="button-sparkle"></div>
+        </button>
+    </div>
+    
+    <div class="intro-particles"></div>
+</div>
+        
+        <div class="intro-particles"></div>
+    </div>
     <div class="container">
         <div class="header">
-            <h1>🍽️ Eat This Photo</h1>
-            <p>Upload a menu image and generate beautiful item visuals</p>
+            <div class="header-content">
+                <h1>EatThis.photo</h1>
+                <p>Transform menu images into beautiful item visuals with AI</p>
+            </div>
         </div>
 
         <div class="upload-section">
-            <div class="demo-note">
-                <strong>Live Mode:</strong> This app will now use real API calls to extract menu text and generate images!
+            <div class="status-badge">
+                <span class="status-indicator"></span>
+                Live Mode Active - Real API Integration
             </div>
 
             <div class="api-config">
                 <h3>API Configuration</h3>
-                <input type="text" id="geminiKey" class="api-input" placeholder="Gemini API Key (for text extraction )">
-                <small style="color: #666;">Get your free Gemini API key from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></small>
+                <div class="input-group">
+                    <input type="text" id="geminiKey" class="api-input" placeholder="Enter your Gemini API key">
+                    <div class="input-help">
+                        Get your free API key from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>
+                    </div>
+                </div>
             </div>
 
             <div class="upload-area" onclick="document.getElementById('cameraInput').click()">
-                <div class="upload-icon">📷</div>
-                <div class="upload-text">Click to scan image</div>
-                <!-- <div class="upload-subtext">or drag and drop here</div> -->
+                <div class="upload-content">
+                    <div class="upload-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="upload-text">Scan Menu Image</div>
+                    <div class="upload-subtext">Click to capture or upload</div>
+                </div>
             </div>
-            <!-- <input type="file" id="fileInput" accept="image/*"> -->
-             <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
             
             <div id="uploadedImageContainer" style="display: none;">
-                <img id="uploadedImage" class="uploaded-image" alt="Uploaded menu">
-                <br>
-                <button class="btn" onclick="processMenu()">Generate Menu Items</button>
+                <div class="image-preview">
+                    <img id="uploadedImage" class="uploaded-image" alt="Uploaded menu">
+                </div>
+                <button class="btn-primary" onclick="processMenu()">
+                    <span>Generate Menu Items</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
             </div>
         </div>
 
         <div id="processing" class="processing" style="display: none;">
-            <div class="spinner"></div>
-            <h3>Processing your menu...</h3>
-            <p>Extracting text and generating images</p>
+            <div class="processing-content">
+                <div class="spinner"></div>
+                <h3>Processing Menu</h3>
+                <p>Extracting text and generating visuals...</p>
+            </div>
         </div>
 
         <div id="menuResults" class="menu-results" style="display: none;">
-            <h2>Generated Menu Items</h2>
+            <div class="results-header">
+                <h2>Generated Menu Items</h2>
+            </div>
             <div id="menuGrid" class="menu-grid"></div>
         </div>
     </div>
