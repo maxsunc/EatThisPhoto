@@ -5,72 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eat This Photo</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
-        <!-- Intro Screen - Insert this right after <body> tag and before the container div -->
-<div id="introScreen" class="intro-screen">
-    <div class="intro-background">
-        <div class="floating-elements">
-            <div class="element element-1">🍟</div>
-            <div class="element element-2">🍕</div>
-            <div class="element element-3">🌮</div>
-            <div class="element element-4">🍰</div>
-            <div class="element element-5">🥗</div>
-            <div class="element element-6">🍜</div>
+    <!-- Enhanced Intro Screen -->
+    <div id="introScreen" class="intro-screen">
+        <div class="intro-background">
+            <div class="floating-elements">
+                <div class="element element-1">🍟</div>
+                <div class="element element-2">🍕</div>
+                <div class="element element-3">🌮</div>
+                <div class="element element-4">🍰</div>
+                <div class="element element-5">🥗</div>
+                <div class="element element-6">🍜</div>
+                <div class="element element-7">🍔</div>
+                <div class="element element-8">🥘</div>
+            </div>
         </div>
-    </div>
-    
-    <div class="intro-content">
-        <div class="hamburger-container">
-            <div class="hamburger">
-                <div class="bun-top">
-                    <div class="sesame sesame-1"></div>
-                    <div class="sesame sesame-2"></div>
-                    <div class="sesame sesame-3"></div>
-                    <div class="sesame sesame-4"></div>
-                    <div class="sesame sesame-5"></div>
+        
+        <div class="intro-content">
+            <div class="hamburger-container">
+                <div class="hamburger">
+                    <div class="bun-top">
+                        <div class="sesame sesame-1"></div>
+                        <div class="sesame sesame-2"></div>
+                        <div class="sesame sesame-3"></div>
+                        <div class="sesame sesame-4"></div>
+                        <div class="sesame sesame-5"></div>
+                    </div>
+                    <div class="lettuce"></div>
+                    <div class="tomato"></div>
+                    <div class="patty"></div>
+                    <div class="cheese"></div>
+                    <div class="bun-bottom"></div>
                 </div>
-                
-                <div class="tomato"></div>
-                <div class="patty"></div>
-                <div class="lettuce"></div>
-<div class="bottom-layer">
-    <div class="cheese"></div>
-    <div class="bun-bottom"></div>
-</div>
-
             </div>
             
+            <h1 class="intro-title">
+                <span class="word">Eat</span>
+                <span class="word">This</span>
+                <span class="word">Photo</span>
+            </h1>
+            
+            <p class="intro-subtitle">Transform menu images into stunning food visuals with AI magic ✨</p>
+            
+            <button class="start-button" onclick="startApp()">
+                <span>Start Creating</span>
+                <div class="button-sparkle"></div>
+            </button>
         </div>
-        
-        <h1 class="intro-title">
-            <span class="word">Eat</span>
-            <span class="word">This</span>
-            <span class="word">Photo</span>
-        </h1>
-        
-        <p class="intro-subtitle">Transform menu images into stunning visuals with AI magic</p>
-        
-        <button class="start-button" onclick="startApp()">
-            <span>Start Creating</span>
-            <div class="button-sparkle"></div>
-        </button>
-    </div>
-    
-    <div class="intro-particles"></div>
-</div>
         
         <div class="intro-particles"></div>
     </div>
+        
     <div class="container">
+        <!-- Enhanced Header -->
         <div class="header">
             <div class="header-content">
-                <h1>EatThis.photo</h1>
-                <p>Transform menu images into beautiful item visuals with AI</p>
+                <div class="logo-section">
+                    <div class="logo-icon">🍽️</div>
+                    <h1>EatThis.photo</h1>
+                </div>
+                <p class="header-subtitle">Transform menu images into beautiful item visuals with AI</p>
+                <div class="feature-badges">
+                    <span class="badge">AI-Powered</span>
+                    <span class="badge">Instant Results</span>
+                    <span class="badge">High Quality</span>
+                </div>
             </div>
         </div>
 
+        <!-- Enhanced Upload Section -->
         <div class="upload-section">
             <div class="status-badge">
                 <span class="status-indicator"></span>
@@ -78,9 +83,15 @@
             </div>
 
             <div class="api-config">
-                <h3>API Configuration</h3>
+                <div class="config-header">
+                    <h3>🔑 API Configuration</h3>
+                    <p class="config-subtitle">Connect your Gemini API for processing</p>
+                </div>
                 <div class="input-group">
-                    <input type="text" id="geminiKey" class="api-input" placeholder="Enter your Gemini API key">
+                    <div class="input-wrapper">
+                        <input type="text" id="geminiKey" class="api-input" placeholder="Enter your Gemini API key">
+                        <div class="input-icon">🔐</div>
+                    </div>
                     <div class="input-help">
                         Get your free API key from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>
                     </div>
@@ -90,42 +101,60 @@
             <div class="upload-area" onclick="document.getElementById('cameraInput').click()">
                 <div class="upload-content">
                     <div class="upload-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                             <circle cx="12" cy="13" r="4"/>
                         </svg>
                     </div>
-                    <div class="upload-text">Scan Menu Image</div>
-                    <div class="upload-subtext">Click to capture or upload</div>
+                    <div class="upload-text">📸 Scan Menu Image</div>
+                    <div class="upload-subtext">Click to capture or drag & drop your menu</div>
+                    <div class="upload-formats">Supports JPG, PNG, WEBP</div>
                 </div>
+                <div class="upload-glow"></div>
             </div>
 
             <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
             
-            <div id="uploadedImageContainer" style="display: none;">
+            <div id="uploadedImageContainer" class="uploaded-container" style="display: none;">
                 <div class="image-preview">
                     <img id="uploadedImage" class="uploaded-image" alt="Uploaded menu">
+                    <div class="image-overlay">
+                        <div class="image-info">
+                            <span class="image-status">✅ Image Ready</span>
+                        </div>
+                    </div>
                 </div>
-                <button class="btn-primary" onclick="processMenu()">
-                    <span>Generate Menu Items</span>
+            </div>
+             <button class="btn-primary" onclick="processMenu()">
+                    <span>🚀 Generate Menu Items</span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
                 </button>
-            </div>
         </div>
+                       
 
+
+        <!-- Enhanced Processing Section -->
         <div id="processing" class="processing" style="display: none;">
             <div class="processing-content">
-                <div class="spinner"></div>
-                <h3>Processing Menu</h3>
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                    <div class="spinner-glow"></div>
+                </div>
+                <h3>🔄 Processing Menu</h3>
                 <p>Extracting text and generating visuals...</p>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
             </div>
         </div>
 
-        <div id="menuResults" class="menu-results" style="display: none;">
+        <!-- Enhanced Results Section -->
+        <div id="menuResults" class="menu-results" style="display: none; margin-top: 20px;">
             <div class="results-header">
-                <h2>Generated Menu Items</h2>
+                <h2>🎨 Generated Menu Items</h2>
+                <p class="results-subtitle">AI-powered food visuals ready for your menu</p>
             </div>
             <div id="menuGrid" class="menu-grid"></div>
         </div>
