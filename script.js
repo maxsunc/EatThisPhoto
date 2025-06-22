@@ -100,16 +100,10 @@ function showError(message) {
   }, 5000)
 }
 
-// Menu processing with Gemini APIs
+// Menu processing with Netlify Functions (no API key needed from user)
 async function processMenu() {
   const processing = document.getElementById("processing")
   const menuResults = document.getElementById("menuResults")
-  const geminiKey = document.getElementById("geminiKey").value.trim()
-
-  if (!geminiKey) {
-    showError("Please provide a Gemini API key for processing.")
-    return
-  }
 
   if (!uploadedFile) {
     showError("Please upload a menu image first.")
@@ -129,17 +123,17 @@ async function processMenu() {
   menuResults.style.display = "none"
 
   try {
-    // Step 1: Extract menu text using Gemini Vision
-    updateProcessingText("🔍 Extracting menu text with Gemini...")
-    const menuItems = await extractMenuTextWithGemini(uploadedFile, geminiKey)
+    // Step 1: Extract menu text using Netlify function
+    updateProcessingText("🔍 Extracting menu text...")
+    const menuItems = await extractMenuTextWithNetlify(uploadedFile)
 
     if (!menuItems || menuItems.length === 0) {
       throw new Error("No menu items could be extracted from the image")
     }
 
-    // Step 2: Generate images for each menu item using Gemini
-    updateProcessingText("🎨 Generating food images with Gemini...")
-    const itemsWithImages = await generateImagesWithGemini(menuItems, geminiKey)
+    // Step 2: Generate images for each menu item using Netlify function
+    updateProcessingText("🎨 Generating food images...")
+    const itemsWithImages = await generateImagesWithNetlify(menuItems)
 
     // Enhanced completion animation
     processing.style.opacity = "0"
@@ -174,65 +168,27 @@ function updateProcessingText(text) {
   }
 }
 
-// Extract menu text using Gemini Vision API
-async function extractMenuTextWithGemini(imageFile, apiKey) {
+// Extract menu text using Netlify function
+async function extractMenuTextWithNetlify(imageFile) {
   try {
     const base64Image = await fileToBase64(imageFile)
     const mimeType = imageFile.type
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `Please analyze this menu image and extract all menu items. For each item, provide:
-1. name (string)
-2. description (string, if available)
-3. price (string, if available)
-4. estimated nutrition facts as a string (e.g., "Calories: 450, Protein: 12g, Fat: 20g, Carbs: 55g")
-
-Return the data as a JSON array like this:
-[
-    {
-        "name": "Item Name",
-        "description": "Item description",
-        "price": "$0.00",
-        "nutrition": "Calories: 450, Protein: 12g, Fat: 20g, Carbs: 55g"
-    }
-]
-
-If no description is available, create one based on the name. If no price is available, use "Market Price". If nutrition cannot be determined from the name, make a reasonable guess. Ensure all fields are strings and the response is valid JSON.`,
-                },
-                {
-                  inline_data: {
-                    mime_type: mimeType,
-                    data: base64Image,
-                  },
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.4,
-            topK: 32,
-            topP: 1,
-            maxOutputTokens: 2048,
-          },
-        }),
+    const response = await fetch('/.netlify/functions/gemini-vision', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+      body: JSON.stringify({
+        imageData: base64Image,
+        mimeType: mimeType
+      }),
+    })
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      const errorMessage = errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`
-      throw new Error(`Gemini API error: ${errorMessage}`)
+      const errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`
+      throw new Error(`API error: ${errorMessage}`)
     }
 
     const data = await response.json()
@@ -260,13 +216,11 @@ If no description is available, create one based on the name. If no price is ava
       }
     } catch (parseError) {
       console.error("Failed to parse JSON:", content)
-      throw new Error("Failed to parse menu data from Gemini response")
+      throw new Error("Failed to parse menu data from API response")
     }
   } catch (error) {
-    if (error.message.includes("API key") || error.message.includes("403")) {
-      throw new Error("Invalid Gemini API key. Please check your API key and try again.")
-    } else if (error.message.includes("quota") || error.message.includes("429")) {
-      throw new Error("Gemini API quota exceeded. Please check your usage limits.")
+    if (error.message.includes("quota") || error.message.includes("429")) {
+      throw new Error("API quota exceeded. Please try again later.")
     } else if (error.message.includes("rate limit")) {
       throw new Error("Rate limit exceeded. Please wait a moment and try again.")
     }
@@ -274,8 +228,8 @@ If no description is available, create one based on the name. If no price is ava
   }
 }
 
-// Generate images using Gemini
-async function generateImagesWithGemini(menuItems, geminiApiKey) {
+// Generate images using Netlify function
+async function generateImagesWithNetlify(menuItems) {
   const menuResults = document.getElementById("menuResults")
   const menuGrid = document.getElementById("menuGrid")
   menuGrid.innerHTML = ""
@@ -297,7 +251,7 @@ async function generateImagesWithGemini(menuItems, geminiApiKey) {
     updateProcessingText(`🎨 Generating image ${i + 1}/${menuItems.length}: ${item.name}`)
 
     try {
-      const imageData = await generateGeminiImage(item, geminiApiKey)
+      const imageData = await generateNetlifyImage(item)
 
       const itemWithImage = {
         ...item,
@@ -333,44 +287,30 @@ async function generateImagesWithGemini(menuItems, geminiApiKey) {
   return processedItems
 }
 
-// Generate image using Gemini API
-async function generateGeminiImage(item, apiKey) {
+// Generate image using Netlify function
+async function generateNetlifyImage(item) {
   try {
     // Create a detailed prompt for professional food photography
     const prompt = createFoodPrompt(item)
 
     console.log(`Generating image for ${item.name} with prompt: ${prompt}`)
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            responseModalities: ["TEXT", "IMAGE"],
-          },
-        }),
+    const response = await fetch('/.netlify/functions/gemini-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+      body: JSON.stringify({
+        prompt: prompt
+      }),
+    })
 
     console.log(`Response status: ${response.status}`)
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      const errorMessage = errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`
-      throw new Error(`Gemini API error (${response.status}): ${errorMessage}`)
+      const errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`
+      throw new Error(`API error (${response.status}): ${errorMessage}`)
     }
 
     const data = await response.json()
@@ -405,13 +345,9 @@ async function generateGeminiImage(item, apiKey) {
 
     // Provide more specific error messages
     if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
-      throw new Error("Network error: Unable to connect to Gemini API.")
-    } else if (error.message.includes("401")) {
-      throw new Error("Invalid Gemini API key. Please check your API key.")
-    } else if (error.message.includes("403")) {
-      throw new Error("Gemini API access forbidden. Check your API key permissions.")
+      throw new Error("Network error: Unable to connect to API.")
     } else if (error.message.includes("429")) {
-      throw new Error("Gemini API rate limit exceeded. Please wait and try again.")
+      throw new Error("API rate limit exceeded. Please wait and try again.")
     }
 
     throw error
@@ -604,15 +540,3 @@ function startApp() {
     }
   }, 800) // Match the CSS transition duration
 }
-
-// Optional: Auto-hide intro screen after a certain time (uncomment if desired)
-// setTimeout(() => {
-//     startApp();
-// }, 5000); // Auto-hide after 5 seconds
-
-// Optional: Hide intro on any key press (uncomment if desired)
-// document.addEventListener('keydown', (e) => {
-//     if (document.getElementById('introScreen').style.display !== 'none') {
-//         startApp();
-//     }
-// });
