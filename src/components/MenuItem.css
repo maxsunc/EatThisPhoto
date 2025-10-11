@@ -1,0 +1,103 @@
+/* MenuItem Component Styles */
+.menu-item {
+    background: var(--white);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid var(--gray-200);
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    animation: menuItemAppear 0.6s ease forwards;
+}
+
+@keyframes menuItemAppear {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.menu-item:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: var(--shadow-2xl);
+}
+
+.menu-item-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.fallback-image {
+    width: 100%;
+    height: 250px;
+    background: var(--gradient-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 1rem;
+}
+
+.menu-item:hover .menu-item-image {
+    transform: scale(1.05);
+}
+
+.menu-item-content {
+    padding: 1.5rem;
+}
+
+.menu-item-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 0.75rem;
+}
+
+.menu-item-description {
+    color: var(--gray-600);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.menu-item-price {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--primary);
+    padding: 0.5rem 1rem;
+    background: var(--primary-light);
+    border-radius: var(--radius-xl);
+    display: inline-block;
+    margin-bottom: 0.75rem;
+}
+
+.menu-item-nutrition {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    border-left: 4px solid var(--success);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .menu-item-content {
+        padding: 1rem;
+    }
+
+    .menu-item-name {
+        font-size: 1.125rem;
+    }
+
+    .menu-item-image,
+    .fallback-image {
+        height: 200px;
+    }
+}

@@ -1,0 +1,48 @@
+/* Error Message Component Styles */
+.error {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 1px solid #f87171;
+    color: #991b1b;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-lg);
+    margin: 1rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
+    animation: errorSlideIn 0.3s ease-out;
+}
+
+.error-close {
+    background: none;
+    border: none;
+    color: #991b1b;
+    cursor: pointer;
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding: 0.25rem;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.error-close:hover {
+    background-color: rgba(153, 27, 27, 0.1);
+}
+
+@keyframes errorSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
