@@ -1,5 +1,5 @@
 
-## Demo Video
+## Demo
 
 [Demo Video](https://www.youtube.com/watch?v=TaDax9I9Czc)
 
